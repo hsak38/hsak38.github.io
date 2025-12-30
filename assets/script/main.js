@@ -8,59 +8,76 @@ let judulList = []; // Variabel global (block-scoped dengan let) untuk menyimpan
 // Ambil daftar judul dari file data menggunakan Fetch API.
 // fetch('data.txt') melakukan HTTP GET ke resource relatif 'data.txt'.
 // fetch mengembalikan Promise yang resolve ke Response; error hanya pada kegagalan jaringan (bukan status 4xx/5xx).
-fetch('data.txt')
-    .then(response => response.text()) // Response.body dibaca sebagai teks (stream → string), mengembalikan Promise<string>.
+fetch('data.txt') // melakukan HTTP GET ke resource relatif 'data.txt'
+    .then(response => response.text())
+    // response.text() mengubah body Response menjadi string isi file
+
     .then(text => {
-        // text.split('|'): memecah payload teks berdasarkan delimiter '|' menghasilkan array string.
-        // .map(j => j.trim()): menghapus whitespace leading/trailing dari setiap elemen.
-        // .filter(j => j !== ''): mengeliminasi entri kosong untuk mencegah item kosong di UI.
-        judulList = text.split('|').map(j => j.trim()).filter(j => j !== '');
-        // Render awal seluruh daftar ke DOM menggunakan fungsi tampilkanJudul.
+        // Pecah isi file berdasarkan tanda pemisah '|'
+        judulList = text.split('|')
+            .map(item => {
+                // Setiap item dipisah lagi berdasarkan tanda '-'
+                const parts = item.split('-');
+                return {
+                    // Bagian pertama dianggap judul
+                    judul: parts[0].trim(),
+                    // Bagian kedua (jika ada) dianggap kategori
+                    kategori: (parts[1] || "").trim()
+                };
+            })
+            // Buang entri yang tidak punya judul
+            .filter(obj => obj.judul !== '');
+
+        // Panggil fungsi untuk menampilkan daftar judul ke halaman
         tampilkanJudul(judulList);
     })
-    .catch(error => console.error('Gagal memuat data:', error)); // Penanganan error Promise: log stack/objek error ke konsol.
+
+    // Tangani error jaringan (misalnya file tidak ditemukan atau gagal fetch)
+    .catch(error => console.error('Gagal memuat data:', error));
 
 // Fungsi tampilkan daftar judul ke dalam <ul id="arsip-list"> dan memperbarui jumlah.
 // Parameter 'list' adalah array string yang akan dirender.
 function tampilkanJudul(list) {
-    const ul = document.getElementById('arsip-list');   // Node referensi kontainer list (UL).
-    const jumlah = document.getElementById('jumlah-judul'); // Node referensi penampil jumlah (SPAN).
-    ul.innerHTML = ""; // Menghapus seluruh child nodes dengan mengosongkan markup; trigger reflow saat append berikutnya.
+    // Ambil elemen <ul> dengan id 'arsip-list' sebagai wadah daftar judul
+    const ul = document.getElementById('arsip-list');
+    // Ambil elemen dengan id 'jumlah-judul' untuk menampilkan jumlah judul
+    const jumlah = document.getElementById('jumlah-judul');
 
-    // tampilkan jumlah judul saat ini (setelah filter bila ada).
-    // textContent menetapkan node text tanpa parsing HTML (aman terhadap injeksi markup).
+    // Kosongkan isi <ul> sebelum menambahkan item baru
+    ul.innerHTML = "";
+
+    // Tampilkan jumlah judul di elemen jumlah
     jumlah.textContent = list.length;
 
-    // Iterasi list menggunakan Array.prototype.forEach (callback sinkron per elemen).
-    list.forEach((judul, index) => {
-        // Buat node element baru menggunakan Document API. Belum ter-attach ke DOM hingga appendChild dipanggil.
+    // Loop setiap item dalam list (item adalah objek {judul, kategori})
+    list.forEach((item, index) => {
+        // Buat elemen <li> untuk setiap judul
         const li = document.createElement('li');
+        // Buat elemen <a> sebagai link ke file teks
         const link = document.createElement('a');
+        // Isi teks link dengan judul dari item
+        link.textContent = item.judul;
 
-        // Set konten teks anchor; menggunakan textContent agar tidak mengeksekusi HTML/JS yang mungkin terkandung.
-        link.textContent = judul;
-
-        // Konversi judul menjadi nama file yang aman (whitelist karakter + blokir traversal/path injection).
-        const safeName = sanitizeFileName(judul);
+        // Sanitasi nama file agar aman dipakai di path
+        const safeName = sanitizeFileName(item.judul);
         if (safeName) {
-            // Bangun URL ke halaman view dengan parameter query 'file'.
-            // encodeURIComponent meng-encode karakter khusus (spasi, aksen, dll) agar valid di query string.
+            // Set href link ke view.html dengan parameter file
+            // encodeURIComponent memastikan nama file aman di URL
             link.href = `view.html?file=${encodeURIComponent("data/" + safeName + ".txt")}`;
-            // target _self eksplisit: navigasi di konteks browsing yang sama (tab saat ini).
+            // target="_self" artinya link dibuka di tab yang sama
             link.target = "_self";
-            // Sisipkan <a> sebagai child dari <li>; operasi DOM ini menambahkan node ke pohon namun belum ke UL.
+
+            // Masukkan link ke dalam <li>
             li.appendChild(link);
 
-            // Tambahkan kelas CSS untuk animasi; classList adalah DOMTokenList (mutasi atribut class).
+            // Tambahkan kelas CSS 'fade-in' untuk animasi
             li.classList.add('fade-in');
-            // Inline style animation-delay diatur per item untuk efek staggered.
-            // Nilai string dengan satuan 's' (detik). index*0.1 menghasilkan delay linear bertahap.
-            li.style.animationDelay = `${index * 0.1}s`; // setiap item delay 0.1 detik
+            // Atur delay animasi berdasarkan index (0.1s per item)
+            li.style.animationDelay = `${index * 0.1}s`;
 
-            // Append <li> ke dalam <ul>; menyebabkan reflow/repaint sesuai layout engine.
+            // Tambahkan <li> ke dalam <ul>
             ul.appendChild(li);
         }
-        // Jika safeName null, item tidak dirender (fail-safe terhadap input tidak valid/berbahaya).
     });
 }
 
@@ -87,18 +104,50 @@ function sanitizeFileName(name) {
     return safe; // Nama yang sudah dinormalisasi sesuai whitelist.
 }
 
-// Event pencarian aman
+// Tambahkan event listener ke elemen input dengan id 'search'
+// Event 'input' akan dipicu setiap kali pengguna mengetik atau mengubah isi kotak pencarian
 document.getElementById('search').addEventListener('input', function () {
-    // this.value: nilai string input saat event 'input' terpicu (ketikan/paste/delete).
-    // .toLowerCase(): normalisasi untuk pencarian case-insensitive.
-    const keyword = sanitizeInput(this.value.toLowerCase());
-    // Filter array judulList:
-    // - j.toLowerCase(): normalisasi masing-masing judul.
-    // - .includes(keyword): pencocokan substring (O(n*m) tergantung panjang string).
-    const hasil = judulList.filter(j => j.toLowerCase().includes(keyword));
-    // Render ulang hasil filter ke DOM (full re-render konten UL).
+    // Ambil elemen dengan id 'search' (biasanya input text) 
+    // lalu tambahkan event listener untuk event 'input' (setiap kali user mengetik)
+
+    const input = sanitizeInput(this.value.toLowerCase());
+    // Ambil nilai dari input, ubah ke huruf kecil (lowercase),
+    // lalu bersihkan dengan fungsi sanitizeInput (misalnya untuk menghindari karakter berbahaya)
+
+    const parts = input.split('-').map(p => p.trim()).filter(p => p !== '');
+    // Pisahkan input berdasarkan tanda '-' menjadi array
+    // Hilangkan spasi di setiap bagian dengan trim()
+    // Buang elemen kosong agar tidak mengganggu logika pencarian
+
+    let hasil = judulList;
+    // Variabel hasil berisi daftar judul (judulList) sebagai default
+
+    if (parts.length === 0) {
+        // Jika input kosong → tampilkan semua data
+        hasil = judulList;
+    } else if (parts.length === 1) {
+        // Jika hanya ada satu kata → gunakan sebagai keyword
+        // Cari di kategori ATAU judul
+        const keyword = parts[0];
+        hasil = judulList.filter(item =>
+            item.judul.toLowerCase().includes(keyword) ||   // cocokkan dengan judul
+            item.kategori.toLowerCase().includes(keyword)   // atau cocokkan dengan kategori
+        );
+    } else if (parts.length >= 2) {
+        // Jika ada dua kata atau lebih → gunakan pola:
+        // parts[0] dianggap sebagai kategori, parts[1] sebagai judul
+        const kategoriKeyword = parts[0];
+        const judulKeyword = parts[1];
+        hasil = judulList.filter(item =>
+            item.kategori.toLowerCase().includes(kategoriKeyword) && // kategori harus cocok
+            item.judul.toLowerCase().includes(judulKeyword)          // judul juga harus cocok
+        );
+    }
+
     tampilkanJudul(hasil);
+    // Panggil fungsi tampilkanJudul untuk menampilkan hasil pencarian ke layar
 });
+
 
 // Sanitasi input pencarian
 function sanitizeInput(input) {
@@ -113,10 +162,10 @@ function sanitizeInput(input) {
 const navbar = document.querySelector('.search-container');
 
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 0) {
-    navbar.classList.add('shadow');
-  } else {
-    navbar.classList.remove('shadow');
-  }
+    if (window.scrollY > 0) {
+        navbar.classList.add('shadow');
+    } else {
+        navbar.classList.remove('shadow');
+    }
 });
 

@@ -43,7 +43,7 @@ h1 {
 
 .search-container.shadow {
   border-bottom: none;
-  box-shadow: 0 10px 10px -10px rgba(0,0,0,0.2); 
+  box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.2);
 }
 
 /* Input pencarian */
@@ -78,9 +78,15 @@ ul {
   padding: 0 10px;
 }
 
+ul li::before {
+  content: "🖺";
+  margin-right: 10px;
+  font-size: 18px;
+}
+
 li,
 .fade-in {
-  /* margin: 10px 0; */
+  margin: 15px 0;
   opacity: 0;
   transform: translateY(5px);
   animation: fadeIn 0.6s ease forwards;
@@ -102,24 +108,6 @@ code {
   font-family: MyFontMono;
   font-size: 16px;
   color: var(--color-black);
-}
-
-#arsip-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  padding: 20px;
-}
-
-#arsip-list li {
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-  transition: all 0.3s ease;
-}
-
-#arsip-list li:hover {
-  box-shadow: rgba(61, 61, 61, 0.2) 0px 2px 8px 0px;
 }
 
 /* ============= Halaman Isi ============= */
@@ -220,6 +208,11 @@ code {
 }
 
 @media (max-width: 796px) {
+  ul li::before {
+    font-size: 16px;
+    margin-right: 6px;
+  }
+
   #arsip-list {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -247,6 +240,25 @@ code {
 
   .home-btn {
     font-size: 24px;
+  }
+}
+
+@media (max-width: 396px) {
+  #arsip-list {
+    grid-template-columns: repeat(1, 1fr);
+    padding: 12px;
+  }
+
+  .header {
+    justify-content: left;
+  }
+
+  .search-container {
+    padding: 0;
+  }
+
+  input[type="text"] {
+    padding: 10px 10px 10px 0;
   }
 }
 
