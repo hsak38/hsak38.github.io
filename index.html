@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- Deklarasi dokumen sebagai HTML5 -->
+  <meta charset="UTF-8"> <!-- Encoding karakter UTF-8, mendukung karakter internasional -->
+
+  <!-- meta theme-color: memberi warna tema pada UI browser (misalnya address bar di Android Chrome) -->
+  <meta name="theme-color" content="#FFFFFF">
+
+  <!-- meta viewport: mengatur skala tampilan agar responsif di perangkat mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- link favicon: ikon kecil yang muncul di tab browser -->
+  <link rel="shortcut icon" href="/assets/icon/id-0-images-icon.svg" type="image/x-icon">
+
+  <!-- title: judul halaman yang ditampilkan di tab browser -->
+  <title>Selamat Datang di Rarchiv</title>
+
+  <!-- link stylesheet: memuat file CSS eksternal untuk styling -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+  <!-- Header halaman -->
+  <header class="header">
+    <h1>Selamat Datang di Rarchiv</h1>
+    <!-- Elemen <p> dengan id 'jumlah-judul' akan diisi oleh JavaScript (main.js) 
+         untuk menampilkan jumlah judul arsip yang dimuat -->
+    <p id="jumlah-judul"></p>
+  </header>
+
+  <!-- Container pencarian sticky -->
+  <div class="search-container">
+    <!-- Form pencarian, onsubmit="return false;" mencegah reload halaman saat enter ditekan -->
+    <form onsubmit="return false;">
+      <!-- Input teks pencarian, id 'search' dipakai oleh JavaScript untuk event listener -->
+      <input type="text" id="search" name="search" placeholder="Masukkan kata kunci...">
+    </form>
+  </div>
+
+  <!-- Daftar arsip akan ditampilkan di sini oleh JavaScript -->
+  <ul id="arsip-list"></ul>
+
+  <!-- Memuat script eksternal main.js:
+       - Script ini akan mengambil data judul dari file data.txt
+       - Menampilkan daftar judul ke dalam <ul id="arsip-list">
+       - Mengatur event pencarian agar daftar bisa difilter sesuai kata kunci -->
+  <script src="/assets/script/main.js"></script>
+</body>
+</html>

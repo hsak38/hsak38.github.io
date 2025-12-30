@@ -1,0 +1,270 @@
+/* ================= Font ================= */
+@font-face {
+  font-family: 'MyFont';
+  src: url('/assets/font/Quicksand.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'MyFontMono';
+  src: url('/assets/font/FreeMono.ttf') format('truetype');
+}
+
+/* ================= Variabel Global ================= */
+:root {
+  --font-main: 'MyFont';
+  --color-black: #000;
+  --color-gray: #777;
+  --color-white: #fff;
+}
+
+/* ============= Halaman Utama ============= */
+body {
+  font-family: var(--font-main);
+  font-size: 16px;
+  color: var(--color-black);
+  margin: 0 280px;
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: 26px;
+  margin-bottom: 0;
+}
+
+/* Pencarian sticky */
+.search-container {
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #e1e1e1;
+  margin: 0 10px;
+  z-index: 10;
+  transition: box-shadow 0.3s ease;
+}
+
+.search-container.shadow {
+  border-bottom: none;
+  box-shadow: 0 10px 10px -10px rgba(0,0,0,0.2); 
+}
+
+/* Input pencarian */
+input[type="text"] {
+  font-family: MyFont;
+  font-size: 16px;
+  width: 100%;
+  border: none;
+  padding: 10px;
+  transition: color 0.3s ease;
+}
+
+input[type="text"]:focus {
+  outline: none;
+}
+
+/* Header */
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 0 10px;
+}
+
+#jumlah-judul {
+  font-size: 14px;
+}
+
+/* List */
+ul {
+  list-style: none;
+  padding: 0 10px;
+}
+
+li,
+.fade-in {
+  /* margin: 10px 0; */
+  opacity: 0;
+  transform: translateY(5px);
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* Link */
+a {
+  color: var(--color-black);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-gray);
+}
+
+/* Code */
+code {
+  font-family: MyFontMono;
+  font-size: 16px;
+  color: var(--color-black);
+}
+
+#arsip-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+#arsip-list li {
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  transition: all 0.3s ease;
+}
+
+#arsip-list li:hover {
+  box-shadow: rgba(61, 61, 61, 0.2) 0px 2px 8px 0px;
+}
+
+/* ============= Halaman Isi ============= */
+.heading-1 {
+  text-align: left;
+  font-size: 24px;
+}
+
+.heading-2 {
+  margin: 24px 0;
+  font-size: 18px;
+}
+
+.heading-3 {
+  margin: 24px 0;
+  font-size: 16px;
+}
+
+.paragraph-1 {
+  margin: 10px 0;
+  white-space: pre-wrap;
+}
+
+.paragraph-1:empty::before {
+  content: "";
+  display: block;
+  height: 1em;
+}
+
+/* Link khusus */
+.link-1 {
+  color: var(--color-gray);
+}
+
+.link-1:hover {
+  background-color: var(--color-gray);
+  color: var(--color-white);
+  padding: 0 5px;
+}
+
+/* List bertingkat */
+.list-1,
+.list-2,
+.list-3 {
+  list-style-type: "-";
+  padding-left: 10px;
+}
+
+/* Gambar */
+.image-1 {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: rgba(61, 61, 61, 0.2) 0px 2px 8px 0px;
+}
+
+/* Tombol floating ke halaman utama */
+.home-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: var(--color-white);
+  padding: 5px;
+  font-size: 26px;
+  z-index: 100;
+}
+
+/* Animasi fade-in */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============= Responsif ============= */
+@media (max-width: 136px) {
+  body {
+    margin: 0 180px;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 1200px) {
+  body {
+    margin: 0 150px;
+    padding: 0 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 976px) {
+  body {
+    margin: 0 50px;
+  }
+}
+
+@media (max-width: 796px) {
+  #arsip-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 0 10px;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  .heading-1 {
+    font-size: 20px;
+  }
+
+  input[type="text"] {
+    font-size: 14px;
+  }
+
+  .home-btn {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 396px) {
+  #arsip-list {
+    grid-template-columns: repeat(1, 1fr);
+    padding: 12px;
+  }
+
+  .header {
+    justify-content: left;
+  }
+
+  .search-container {
+    padding: 0;
+  }
+
+  input[type="text"] {
+    padding: 10px 10px 10px 0;
+  }
+}
