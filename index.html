@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <!-- Deklarasi dokumen sebagai HTML5 -->
   <meta charset="UTF-8"> <!-- Encoding karakter UTF-8, mendukung karakter internasional -->
@@ -21,6 +22,7 @@
 </head>
 
 <body>
+
   <!-- Header halaman -->
   <header class="header">
     <h1>Selamat Datang di Rarchiv</h1>
@@ -28,6 +30,10 @@
          untuk menampilkan jumlah judul arsip yang dimuat -->
     <p id="jumlah-judul"></p>
   </header>
+
+  <!-- Tombol ikon pencarian -->
+  <button id="toggle-search" class="search-icon"> <img id="icon-toggle" src="/assets/icon/search.svg" alt="Search Icon"
+      width="20" height="20"> </button>
 
   <!-- Container pencarian sticky -->
   <div class="search-container">
@@ -47,4 +53,5 @@
        - Mengatur event pencarian agar daftar bisa difilter sesuai kata kunci -->
   <script src="/assets/script/main.js"></script>
 </body>
+
 </html>

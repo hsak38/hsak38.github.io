@@ -22,7 +22,9 @@ fetch('data.txt') // melakukan HTTP GET ke resource relatif 'data.txt'
                     // Bagian pertama dianggap judul
                     judul: parts[0].trim(),
                     // Bagian kedua (jika ada) dianggap kategori
-                    kategori: (parts[1] || "").trim()
+                    kategori: (parts[1] || "").trim(),
+                    thumbnail: (parts[2] || "").trim(),
+                    preview: (parts[3] || "").trim()
                 };
             })
             // Buang entri yang tidak punya judul
@@ -38,48 +40,49 @@ fetch('data.txt') // melakukan HTTP GET ke resource relatif 'data.txt'
 // Fungsi tampilkan daftar judul ke dalam <ul id="arsip-list"> dan memperbarui jumlah.
 // Parameter 'list' adalah array string yang akan dirender.
 function tampilkanJudul(list) {
-    // Ambil elemen <ul> dengan id 'arsip-list' sebagai wadah daftar judul
-    const ul = document.getElementById('arsip-list');
-    // Ambil elemen dengan id 'jumlah-judul' untuk menampilkan jumlah judul
-    const jumlah = document.getElementById('jumlah-judul');
+  const ul = document.getElementById('arsip-list');
+  const jumlah = document.getElementById('jumlah-judul');
+  ul.innerHTML = "";
+  jumlah.textContent = list.length;
 
-    // Kosongkan isi <ul> sebelum menambahkan item baru
-    ul.innerHTML = "";
+  list.forEach((item, index) => {
+    const li = document.createElement('li');
 
-    // Tampilkan jumlah judul di elemen jumlah
-    jumlah.textContent = list.length;
+    // Thumbnail
+    if (item.thumbnail) {
+      const img = document.createElement('img');
+      img.src = item.thumbnail;
+      img.alt = item.judul;
+      img.classList.add('thumbnail');
+      li.appendChild(img);
+    }
 
-    // Loop setiap item dalam list (item adalah objek {judul, kategori})
-    list.forEach((item, index) => {
-        // Buat elemen <li> untuk setiap judul
-        const li = document.createElement('li');
-        // Buat elemen <a> sebagai link ke file teks
-        const link = document.createElement('a');
-        // Isi teks link dengan judul dari item
-        link.textContent = item.judul;
+    // Judul sebagai link
+    const safeName = sanitizeFileName(item.judul);
+    if (safeName) {
+      const titleLink = document.createElement('a');
+      titleLink.textContent = `${item.judul} - ${item.kategori}`;
+      titleLink.href = `view.html?file=${encodeURIComponent("data/" + safeName + ".txt")}`;
+      titleLink.target = "_self";
 
-        // Sanitasi nama file agar aman dipakai di path
-        const safeName = sanitizeFileName(item.judul);
-        if (safeName) {
-            // Set href link ke view.html dengan parameter file
-            // encodeURIComponent memastikan nama file aman di URL
-            link.href = `view.html?file=${encodeURIComponent("data/" + safeName + ".txt")}`;
-            // target="_self" artinya link dibuka di tab yang sama
-            link.target = "_self";
+      const title = document.createElement('h3');
+      title.appendChild(titleLink);
+      li.appendChild(title);
+    }
 
-            // Masukkan link ke dalam <li>
-            li.appendChild(link);
+    // Preview isi
+    if (item.preview) {
+      const preview = document.createElement('p');
+      preview.textContent = item.preview;
+      li.appendChild(preview);
+    }
 
-            // Tambahkan kelas CSS 'fade-in' untuk animasi
-            li.classList.add('fade-in');
-            // Atur delay animasi berdasarkan index (0.1s per item)
-            li.style.animationDelay = `${index * 0.1}s`;
-
-            // Tambahkan <li> ke dalam <ul>
-            ul.appendChild(li);
-        }
-    });
+    li.classList.add('fade-in');
+    li.style.animationDelay = `${index * 0.1}s`;
+    ul.appendChild(li);
+  });
 }
+
 
 // Sanitasi nama file judul
 function sanitizeFileName(name) {
@@ -168,4 +171,39 @@ window.addEventListener('scroll', () => {
         navbar.classList.remove('shadow');
     }
 });
+
+
+const toggleBtn = document.getElementById('toggle-search');
+const searchContainer = document.querySelector('.search-container');
+const searchInput = document.getElementById('search');
+const iconToggle = document.getElementById('icon-toggle');
+
+toggleBtn.addEventListener('click', () => {
+  searchContainer.classList.toggle('active');
+
+  if (searchContainer.classList.contains('active')) {
+    // ganti ke ikon close
+    iconToggle.src = "/assets/icon/close.svg";
+    iconToggle.alt = "Close Icon";
+    searchInput.focus();
+  } else {
+    // ganti ke ikon search
+    iconToggle.src = "/assets/icon/search.svg";
+    iconToggle.alt = "Search Icon";
+  }
+});
+
+// Tutup otomatis saat ukuran layar berubah
+window.addEventListener('resize', () => {
+  if (searchContainer.classList.contains('active')) {
+    searchContainer.classList.remove('active');
+    // pastikan ikon kembali ke search
+    iconToggle.src = "/assets/icon/search.svg";
+    iconToggle.alt = "Search Icon";
+  }
+});
+
+
+
+
 

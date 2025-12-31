@@ -31,7 +31,7 @@ h1 {
   margin-bottom: 0;
 }
 
-/* Pencarian sticky */
+/* Pencarian sticky
 .search-container {
   position: sticky;
   top: 0;
@@ -39,12 +39,42 @@ h1 {
   margin: 0 10px;
   z-index: 10;
   transition: box-shadow 0.3s ease;
-}
+} */
 
 .search-container.shadow {
   border-bottom: none;
   box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.2);
 }
+
+
+.search-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 0;              /* awalnya 0 */
+  overflow: hidden;
+  background: #fff;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+  transition: width 0.3s ease;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.search-container.active {
+  width: 300px;          /* saat aktif melebar ke 300px */
+}
+
+.search-icon {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+
 
 /* Input pencarian */
 input[type="text"] {
@@ -78,12 +108,6 @@ ul {
   padding: 0 10px;
 }
 
-ul li::before {
-  content: "🖺";
-  margin-right: 10px;
-  font-size: 18px;
-}
-
 li,
 .fade-in {
   margin: 15px 0;
@@ -101,6 +125,10 @@ a {
 
 a:hover {
   color: var(--color-gray);
+}
+
+#arsip-list li img {
+  width: 100%;
 }
 
 /* Code */
@@ -280,3 +308,18 @@ code {
     padding: 10px 10px 10px 0;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
