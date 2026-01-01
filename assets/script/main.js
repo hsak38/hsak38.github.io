@@ -194,12 +194,15 @@ toggleBtn.addEventListener('click', () => {
 });
 
 // Tutup otomatis saat ukuran layar berubah
+const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
 window.addEventListener('resize', () => {
-  if (searchContainer.classList.contains('active')) {
-    searchContainer.classList.remove('active');
-    // pastikan ikon kembali ke search
-    iconToggle.src = "/assets/icon/search.svg";
-    iconToggle.alt = "Search Icon";
+  if (!isTouchDevice) { // hanya perangkat non-touch (desktop)
+    if (searchContainer.classList.contains('active')) {
+      searchContainer.classList.remove('active');
+      iconToggle.src = "/assets/icon/search.svg";
+      iconToggle.alt = "Search Icon";
+    }
   }
 });
 
