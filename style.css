@@ -1,4 +1,8 @@
-/* Reset dasar */
+@font-face {
+  font-family: 'FreeMono';
+  src: url('/assets/font/KodeMono.ttf') format('truetype');
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,33 +10,89 @@
 }
 
 body {
-  background: #c0c0c0; /* abu-abu klasik */
+  background-color: #d4d0c8;
   color: #000;
-  font-family: "MS Sans Serif", "Tahoma", sans-serif;
-  line-height: 1.4;
+  font-family: "FreeMono";
+  line-height: 1.5;
 }
 
 /* Header */
 header {
-  background: #d4d0c8; /* abu-abu lebih terang */
+  background-color: #d4d0c8;
+  position: fixed;
+  display: flex;
+  width: calc(100% - 0px);
+  top: 0;
   padding: 10px;
-  border-bottom: 2px solid #808080;
-  text-align: center;
+  height: 60px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid gray;
+  z-index: 999;
 }
 
-header h1 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 8px;
+#link-title {
+  color: #000;
+  z-index: 10;
+  text-decoration: none;
 }
 
+#page-title {
+  font-size: 20px;
+  color: #000080;
+  /* text-shadow: 2px 2px 2px #f8f8f8; */
+}
+
+/* wrapper agar input bisa animasi */
+.search-wrapper {
+  position: fixed;
+  width: calc(100% - 20px);
+  /* padding: 0; */
+  right: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+  z-index: 1;
+}
+
+/* input default: tersembunyi */
 #search-box {
+  width: 0;
+  opacity: 0;
   padding: 6px;
-  width: 250px;
   border: 2px inset #fff;
   background: #fff;
-  font-size: 0.9rem;
+  transition: width 0.4s ease, opacity 0.4s ease;
+  overflow: hidden;
 }
+
+#search-box:focus {
+  outline: none;
+}
+
+/* saat aktif: input melebar ke kiri */
+.search-wrapper.active #search-box {
+  width: 100%;
+  opacity: 1;
+  /* margin-left: 8px;  */
+}
+
+#toggle-search {
+  background-color: #d4d0c8;
+  border: 2px outset #fff;
+}
+
+#toggle-search:hover {
+  border: 2px inset #fff;
+}
+
+#icon-toggle {
+  width: 24px;
+  height: 26px;
+  padding: 2px;
+}
+
 
 /* Blog List Grid */
 #blog-list {
@@ -41,12 +101,16 @@ header h1 {
   gap: 15px;
   max-width: 1000px;
   margin: 20px auto;
-  padding: 0 10px;
+  padding: 10px;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 480px) {
   #blog-list {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .search-wrapper{
+    width: auto;
   }
 }
 
@@ -60,6 +124,7 @@ header h1 {
 .blog-card {
   background: #d4d0c8;
   border: 2px outset #fff;
+  /* border-radius: 10px; */
   padding: 10px;
 }
 
@@ -72,7 +137,7 @@ header h1 {
 }
 
 .blog-card h2 {
-  font-size: 1rem;
+  font-size: 18px;
   margin-bottom: 4px;
 }
 
@@ -86,12 +151,12 @@ header h1 {
 }
 
 .blog-card p {
-  font-size: 0.9rem;
+  font-size: 14px;
   margin-bottom: 4px;
 }
 
 .blog-card small {
-  font-size: 0.8rem;
+  font-size: 12px;
   color: #333;
 }
 
@@ -117,11 +182,15 @@ header h1 {
 
 /* View Page */
 main {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 15px;
+  /* max-width: 700px; */
+  margin: 60px auto;
+  /* padding: 15px; */
   background: #d4d0c8;
-  border: 2px inset #fff;
+  /* border: 2px inset #fff; */
+}
+
+#main {
+  margin: 0 auto;
 }
 
 /* Back to Home Button */
@@ -143,3 +212,4 @@ main {
 .btn-home:hover {
   border: 2px inset #fff;
 }
+

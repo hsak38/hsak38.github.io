@@ -1,20 +1,76 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <meta name="theme-color" content="#FFFFFF">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog Main</title>
   <link rel="stylesheet" href="style.css">
   <script src="blog.js" defer></script>
 </head>
 <body>
   <header>
-    <h1>Daftar Blog</h1>
-    <input type="text" id="search-box" placeholder="Cari artikel... (judul, preview, tanggal, kategori)">
+    <a href="index.html" id="link-title"><h1 id="page-title">Hsak38</h1></a>
+    <div class="search-wrapper">
+      <input type="text" id="search-box" placeholder="Cari artikel...">
+      <button id="toggle-search">
+        <img id="icon-toggle" src="/assets/icon/search.svg" alt="Search Icon">
+      </button>
+    </div>
   </header>
+
 
   <main>
     <div id="blog-list"></div>
     <div id="pagination"></div>
   </main>
+
+  <script>
+    const toggleBtn = document.getElementById('toggle-search');
+    const searchWrapper = document.querySelector('.search-wrapper');
+    const searchInput = document.getElementById('search-box');
+    const iconToggle = document.getElementById('icon-toggle');
+    const pageTitle = document.getElementById('page-title');
+
+    toggleBtn.addEventListener('click', () => {
+      searchWrapper.classList.toggle('active');
+
+      if (searchWrapper.classList.contains('active')) {
+        iconToggle.src = "/assets/icon/close.svg";
+        iconToggle.alt = "Close Icon";
+        searchInput.focus();
+
+        // jika layar kecil (<480px), sembunyikan h1 
+        if (window.innerWidth < 480) { 
+          pageTitle.style.display = "none"; 
+        }
+      } else {
+        iconToggle.src = "/assets/icon/search.svg";
+        iconToggle.alt = "Search Icon";
+        searchInput.value = ""; // reset pencarian
+
+        // kembalikan h1 
+        pageTitle.style.display = "";
+      }
+    });
+
+    // Tutup otomatis saat ukuran layar berubah
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
+    window.addEventListener('resize', () => {
+      if (!isTouchDevice) { // hanya perangkat non-touch (desktop)
+        if (searchWrapper.classList.contains('active')) {
+          searchWrapper.classList.remove('active');
+          iconToggle.src = "/assets/icon/search.svg";
+          iconToggle.alt = "Search Icon";
+        }if (window.innerWidth >= 480) { 
+          pageTitle.style.display = ""; 
+        }if (window.innerWidth < 480) { 
+          pageTitle.style.display = ""; 
+        }
+      }
+    });
+
+  </script>
 </body>
 </html>

@@ -52,17 +52,13 @@ function renderBlogs() {
     card.className = "blog-card";
 
     card.innerHTML = `
-        <img src="${blog.thumb}" 
-            alt="${blog.title}" 
-            style="width:60px;height:40px;object-fit:cover;" 
-            loading="lazy">
+        <img src="${blog.thumb}" alt="${blog.title}" style="width:100%;height:auto;object-fit:cover;">
         <div>
             <h2><a href="view.html?file=${blog.file}">${blog.title}</a></h2>
             <p>${blog.preview}</p>
             <small>${blog.date} | Kategori: ${blog.category}</small>
         </div>
     `;
-
 
     container.appendChild(card);
   });
@@ -165,14 +161,14 @@ async function loadBlog() {
     }
     const text = await response.text();
 
-    // Ambil judul dari nama file
-    let rawTitle = file.replace(".txt", "").replace(/-/g, " ");
-    rawTitle = rawTitle.replace(/\b\w/g, c => c.toUpperCase());
+    // // Ambil judul dari nama file
+    // let rawTitle = file.replace(".txt", "").replace(/-/g, " ");
+    // rawTitle = rawTitle.replace(/\b\w/g, c => c.toUpperCase());
 
-    // Set judul dengan fade effect
-    document.title = rawTitle;
-    titleEl.innerText = rawTitle;
-    titleEl.classList.add("fade-in");
+    // // Set judul dengan fade effect
+    // document.title = rawTitle;
+    // titleEl.innerText = rawTitle;
+    // titleEl.classList.add("view-title");
 
     // Render isi dengan parser + fade effect
     contentEl.innerHTML = parseCustomMarkup(text);
