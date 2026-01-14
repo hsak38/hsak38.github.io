@@ -1,0 +1,145 @@
+/* Reset dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #c0c0c0; /* abu-abu klasik */
+  color: #000;
+  font-family: "MS Sans Serif", "Tahoma", sans-serif;
+  line-height: 1.4;
+}
+
+/* Header */
+header {
+  background: #d4d0c8; /* abu-abu lebih terang */
+  padding: 10px;
+  border-bottom: 2px solid #808080;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+#search-box {
+  padding: 6px;
+  width: 250px;
+  border: 2px inset #fff;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+/* Blog List Grid */
+#blog-list {
+  display: grid;
+  grid-template-columns: 1fr; /* mobile-first */
+  gap: 15px;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+@media (min-width: 600px) {
+  #blog-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  #blog-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Blog Card */
+.blog-card {
+  background: #d4d0c8;
+  border: 2px outset #fff;
+  padding: 10px;
+}
+
+.blog-card img {
+  width: 100%;
+  height: 140px;
+  border: 2px solid #808080;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.blog-card h2 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.blog-card h2 a {
+  text-decoration: none;
+  color: #000080; /* biru klasik link */
+}
+
+.blog-card h2 a:hover {
+  text-decoration: underline;
+}
+
+.blog-card p {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.blog-card small {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+/* Pagination */
+#pagination {
+  text-align: center;
+  margin: 15px 0;
+}
+
+#pagination button {
+  background: #d4d0c8;
+  border: 2px outset #fff;
+  padding: 6px 12px;
+  margin: 0 2px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#pagination button:disabled {
+  border: 2px inset #fff;
+  color: #666;
+}
+
+/* View Page */
+main {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 15px;
+  background: #d4d0c8;
+  border: 2px inset #fff;
+}
+
+/* Back to Home Button */
+.back-home {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.btn-home {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #d4d0c8;
+  border: 2px outset #fff;
+  color: #000;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-home:hover {
+  border: 2px inset #fff;
+}

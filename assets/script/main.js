@@ -5,6 +5,20 @@ document.getElementById('search').focus();
 
 let judulList = []; // Variabel global (block-scoped dengan let) untuk menyimpan array judul yang di-parse dari data.txt
 
+
+
+
+
+let currentPage = 1;
+const itemsPerPage = 12; // jumlah artikel per halaman
+
+
+
+
+
+
+
+
 // Ambil daftar judul dari file data menggunakan Fetch API.
 // fetch('data.txt') melakukan HTTP GET ke resource relatif 'data.txt'.
 // fetch mengembalikan Promise yang resolve ke Response; error hanya pada kegagalan jaringan (bukan status 4xx/5xx).
@@ -39,16 +53,77 @@ fetch('data.txt') // melakukan HTTP GET ke resource relatif 'data.txt'
 
 // Fungsi tampilkan daftar judul ke dalam <ul id="arsip-list"> dan memperbarui jumlah.
 // Parameter 'list' adalah array string yang akan dirender.
+// function tampilkanJudul(list) {
+//   const ul = document.getElementById('arsip-list');
+//   const jumlah = document.getElementById('jumlah-judul');
+//   ul.innerHTML = "";
+//   jumlah.textContent = list.length;
+
+//   list.forEach((item, index) => {
+//     const li = document.createElement('li');
+
+//     // Thumbnail
+//     if (item.thumbnail) {
+//       const img = document.createElement('img');
+//       img.src = item.thumbnail;
+//       img.alt = item.judul;
+//       img.classList.add('thumbnail');
+//       li.appendChild(img);
+//     }
+
+//     // Judul sebagai link
+//     const safeName = sanitizeFileName(item.judul);
+//     if (safeName) {
+//       const titleLink = document.createElement('a');
+//       titleLink.textContent = `${item.judul} - ${item.kategori}`;
+//       titleLink.href = `view.html?file=${encodeURIComponent("data/" + safeName + ".txt")}`;
+//       titleLink.target = "_self";
+
+//       const title = document.createElement('h3');
+//       title.appendChild(titleLink);
+//       li.appendChild(title);
+//     }
+
+//     // Preview isi
+//     if (item.preview) {
+//       const preview = document.createElement('p');
+//       preview.textContent = item.preview;
+//       li.appendChild(preview);
+//     }
+
+//     li.classList.add('fade-in');
+//     li.style.animationDelay = `${index * 0.1}s`;
+//     ul.appendChild(li);
+//   });
+// }
+
+
+
+
+
+
+
 function tampilkanJudul(list) {
   const ul = document.getElementById('arsip-list');
   const jumlah = document.getElementById('jumlah-judul');
   ul.innerHTML = "";
   jumlah.textContent = list.length;
 
-  list.forEach((item, index) => {
+  const totalPages = Math.ceil(list.length / itemsPerPage); 
+  
+  // ✅ Jika currentPage lebih besar dari totalPages, turunkan ke halaman terakhir 
+  if (currentPage > totalPages) { 
+    currentPage = totalPages > 0 ? totalPages : 1;
+  }
+
+  // Hitung batas pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = list.slice(startIndex, endIndex);
+
+  paginatedItems.forEach((item, index) => {
     const li = document.createElement('li');
 
-    // Thumbnail
     if (item.thumbnail) {
       const img = document.createElement('img');
       img.src = item.thumbnail;
@@ -57,7 +132,6 @@ function tampilkanJudul(list) {
       li.appendChild(img);
     }
 
-    // Judul sebagai link
     const safeName = sanitizeFileName(item.judul);
     if (safeName) {
       const titleLink = document.createElement('a');
@@ -70,7 +144,6 @@ function tampilkanJudul(list) {
       li.appendChild(title);
     }
 
-    // Preview isi
     if (item.preview) {
       const preview = document.createElement('p');
       preview.textContent = item.preview;
@@ -81,7 +154,101 @@ function tampilkanJudul(list) {
     li.style.animationDelay = `${index * 0.1}s`;
     ul.appendChild(li);
   });
+
+  // Render pagination controls
+  renderPagination(list.length);
 }
+
+
+
+function renderPagination(totalItems) {
+  const pagination = document.getElementById('pagination');
+  pagination.innerHTML = "";
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // Tombol Previous
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = "Previous";
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePage();
+    }
+  });
+  pagination.appendChild(prevBtn);
+
+  // Tentukan range halaman yang ditampilkan (2–3 terdekat)
+  let startPage = Math.max(1, currentPage - 1);
+  let endPage = Math.min(totalPages, currentPage + 1);
+
+  // Jika ingin 3 halaman terdekat, bisa pakai -1 dan +1
+  // Jika di awal/akhir, sesuaikan agar tetap tampil 3 halaman
+  if (currentPage === 1) {
+    endPage = Math.min(totalPages, currentPage + 2);
+  } else if (currentPage === totalPages) {
+    startPage = Math.max(1, currentPage - 2);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.classList.add('page-btn');
+    if (i === currentPage) btn.classList.add('active');
+
+    btn.addEventListener('click', () => {
+      currentPage = i;
+      updatePage();
+    });
+
+    pagination.appendChild(btn);
+  }
+
+  // Tombol Next
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = "Next";
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePage();
+    }
+  });
+  pagination.appendChild(nextBtn);
+}
+
+
+function updatePage() {
+  tampilkanJudul(judulList);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Update URL tanpa reload
+  const url = new URL(window.location);
+  url.searchParams.set('page', currentPage);
+  history.replaceState({}, '', url); // gunakan replaceState agar tidak reload
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const pageParam = parseInt(urlParams.get('page'), 10);
+  if (!isNaN(pageParam) && pageParam > 0) {
+    currentPage = pageParam;
+  }
+  tampilkanJudul(judulList);
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Sanitasi nama file judul
@@ -147,6 +314,9 @@ document.getElementById('search').addEventListener('input', function () {
         );
     }
 
+    // ✅ Reset halaman ke 1 setiap kali pencarian 
+    currentPage = 1;
+
     tampilkanJudul(hasil);
     // Panggil fungsi tampilkanJudul untuk menampilkan hasil pencarian ke layar
 });
@@ -162,7 +332,7 @@ function sanitizeInput(input) {
 }
 
 
-const navbar = document.querySelector('.search-container');
+const navbar = document.querySelector('.header');
 
 window.addEventListener('scroll', () => {
     if (window.scrollY > 0) {
@@ -205,6 +375,41 @@ window.addEventListener('resize', () => {
     }
   }
 });
+
+// window.addEventListener('resize', () => {
+//   if (searchContainer.classList.contains('active')) {
+//     searchContainer.classList.remove('active');
+//     // pastikan ikon kembali ke search
+//     iconToggle.src = "/assets/icon/search.svg";
+//     iconToggle.alt = "Search Icon";
+//   }
+// });
+
+
+const hamburger = document.getElementById("hamburger");
+    const sidebar = document.getElementById("sidebar");
+    const closebtn = document.getElementById("closebtn");
+
+    // Buka sidebar
+    hamburger.addEventListener("click", () => {
+      sidebar.style.width = "100%";
+      sidebar.classList.add("open");
+    });
+
+    // Tutup sidebar
+    closebtn.addEventListener("click", () => {
+      sidebar.style.width = "0";
+      sidebar.classList.remove("open");
+    });
+
+    // Dropdown toggle
+    const dropdown = document.querySelector(".dropdown .dropbtn");
+    const dropdownParent = document.querySelector(".dropdown");
+
+    dropdown.addEventListener("click", (e) => {
+      e.preventDefault();
+      dropdownParent.classList.toggle("active");
+    });
 
 
 
