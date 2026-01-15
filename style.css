@@ -200,11 +200,8 @@ body {
 
 /* View Page */
 main {
-  /* max-width: 700px; */
   margin: 60px auto;
-  /* padding: 15px; */
   background: #d4d0c8;
-  /* border: 2px inset #fff; */
 }
 
 #main {

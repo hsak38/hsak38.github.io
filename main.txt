@@ -1,18 +1,13 @@
-/images/thumbnail-1.webp|Ironi moral : Koko menjual senjata demi perdamaian,|Preview isi blog pertama|2026-01-14|blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog kedua|2026-01-15|judul-blog-2.txt|Lifestyle
-/images/thumbnail-1.webp|Judul Blog 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 3|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 4|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog kedua|2026-01-15|judul-blog-2.txt|Lifestyle
-/images/thumbnail-1.webp|Jormungand : Perdagangan Senjata, Moralitas Kelabu, dan Dunia Tanpa Kepastian|Dalam lanskap anime aksi yang sering kali menampilkan pahlawan idealis dan konflik hitam-putih, Jormungand hadir sebagai karya yang berani menyelami dunia kelabu...|2026-01-14|blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 3|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 4|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog kedua|2026-01-15|judul-blog-2.txt|Lifestyle
-/images/thumbnail-1.webp|Judul Blog 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 3|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|Judul Blog 4|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog pertama|2026-01-14|judul-blog-1.txt|Teknologi
-/images/thumbnail-1.webp|data 1|Preview isi blog kedua|2026-01-15|judul-blog-2.txt|Lifestyle
+
+Judul Pertama|2026-01-15|Teknologi|data/judul1.txt
+Judul Kedua|2026-01-16|Ekonomi|data/judul2.txt
+Judul Ketiga|2026-01-17|Olahraga|data/judul3.txt
+Judul Pertama|2026-01-15|Teknologi|data/judul1.txt
+Judul Kedua|2026-01-16|Ekonomi|data/judul2.txt
+Judul Ketiga|2026-01-17|Olahraga|data/judul3.txt
+Judul Pertama|2026-01-15|Teknologi|data/judul1.txt
+Judul Kedua|2026-01-16|Ekonomi|data/judul2.txt
+Judul Ketiga|2026-01-17|Olahraga|data/judul3.txt
+Judul Pertama|2026-01-15|Teknologi|data/judul1.txt
+Judul Kedua|2026-01-16|Ekonomi|data/judul2.txt
+Judul Ketiga|2026-01-17|Olahraga|data/judul3.txt

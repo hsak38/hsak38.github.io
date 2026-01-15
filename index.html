@@ -1,78 +1,224 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta name="theme-color" content="#FFFFFF">
   <meta charset="UTF-8">
+  <title>Web CLI Reader</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hsak38</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="blog.js" defer></script>
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --cli-bg: #111;
+      --text: #e0e0e0;
+      --accent: #4caf50;
+      --error: #f44336;
+      --info: #2196f3;
+    }
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 10px;
+      background: var(--cli-bg);
+      text-align: center;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    #cli {
+      flex: 1;
+      background: var(--cli-bg);
+      padding: 15px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    #cli .command { color: var(--accent); }
+    #cli .error { color: var(--error); }
+    #cli .info { color: var(--info); }
+    footer {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      background: var(--cli-bg);
+    }
+    #suggestion {
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: var(--info);
+      min-height: 16px;
+    }
+    #command {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background: #222;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+    @media (max-width: 600px) {
+      #cli { font-size: 12px; }
+      #command { font-size: 12px; }
+    }
+  </style>
 </head>
-
 <body>
-  <header class="header-main">
-    <a href="index.html" id="link-title">
-      <h1 id="page-title">Hsak38</h1>
-    </a>
-    <div class="search-wrapper">
-      <input type="text" id="search-box" placeholder="Cari artikel...">
-      <button id="toggle-search">
-        <img id="icon-toggle" src="/assets/icon/search.svg" alt="Search Icon">
-      </button>
-    </div>
-  </header>
-  <main>
-    <div id="blog-list"></div>
-    <div id="pagination"></div>
-  </main>
+  <header>Web CLI Reader</header>
+  <div id="cli">Memuat dokumen dari main.txt...</div>
+  <footer>
+    <div id="suggestion"></div>
+    <input type="text" id="command" placeholder="Ketik perintah lalu Enter...">
+  </footer>
+
   <script>
-    const toggleBtn = document.getElementById('toggle-search');
-    const searchWrapper = document.querySelector('.search-wrapper');
-    const searchInput = document.getElementById('search-box');
-    const iconToggle = document.getElementById('icon-toggle');
-    const pageTitle = document.getElementById('page-title');
+    const cli = document.getElementById("cli");
+    const commandInput = document.getElementById("command");
+    const suggestionBox = document.getElementById("suggestion");
+    let docs = [];
 
-    toggleBtn.addEventListener('click', () => {
-      searchWrapper.classList.toggle('active');
+    const commands = ["show", "list", "search", "help"];
 
-      if (searchWrapper.classList.contains('active')) {
-        iconToggle.src = "/assets/icon/close.svg";
-        iconToggle.alt = "Close Icon";
-        searchInput.focus();
+    function print(msg, cls="") {
+      const span = document.createElement("div");
+      if (cls) span.classList.add(cls);
+      span.textContent = msg;
+      cli.appendChild(span);
+      cli.scrollTop = cli.scrollHeight;
+    }
 
-        // jika layar kecil (<480px), sembunyikan h1 
-        if (window.innerWidth < 480) {
-          pageTitle.style.display = "none";
+    // Baca main.txt
+    fetch("main.txt")
+      .then(res => res.text())
+      .then(text => {
+        docs = text.split("\n")
+          .map(line => line.trim())
+          .filter(Boolean)
+          .map((line, idx) => {
+            const [judul, tanggal, kategori, lokasi] = line.split("|");
+            return { judul, tanggal, kategori, lokasi, originalIndex: idx + 1 };
+          });
+        print("Sistem siap. Ketik 'help' untuk melihat daftar perintah.", "info");
+      })
+      .catch(err => {
+        print("Gagal membaca main.txt: " + err, "error");
+      });
+
+    function showList(keyword, range) {
+      let list = [...docs];
+      if (keyword === "az") list.sort((a,b)=>a.judul.localeCompare(b.judul));
+      else if (keyword === "za") list.sort((a,b)=>b.judul.localeCompare(a.judul));
+      else if (keyword === "baru") list.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal));
+      else if (keyword === "lama") list.sort((a,b)=>new Date(a.tanggal)-new Date(b.tanggal));
+
+      if (range) {
+        const [startStr,endStr]=range.split("-");
+        const start=parseInt(startStr,10)-1;
+        const end=parseInt(endStr,10);
+        if(!isNaN(start)&&!isNaN(end)&&start>=0&&end>start){
+          list=list.slice(start,end);
         }
-      } else {
-        iconToggle.src = "/assets/icon/search.svg";
-        iconToggle.alt = "Search Icon";
-        searchInput.value = ""; // reset pencarian
-
-        // kembalikan h1 
-        pageTitle.style.display = "";
       }
+      print("Daftar dokumen:", "info");
+      list.forEach(d=>print(`${d.originalIndex}. ${d.judul} (${d.tanggal})`));
+    }
+
+    function searchDocs(keyword) {
+      const results = docs.filter(d =>
+        d.judul.toLowerCase().includes(keyword.toLowerCase()) ||
+        d.tanggal.toLowerCase().includes(keyword.toLowerCase()) ||
+        d.kategori.toLowerCase().includes(keyword.toLowerCase())
+      );
+      if(results.length===0) print(`Tidak ada dokumen cocok dengan "${keyword}".`, "error");
+      else {
+        print(`Hasil pencarian "${keyword}":`, "info");
+        results.forEach(d=>print(`${d.originalIndex}. ${d.judul} (${d.tanggal}) [${d.kategori}]`));
+      }
+    }
+
+    function showHelp() {
+      print(`=== Bantuan Perintah ===
+- show <nomor> : tampilkan isi dokumen
+- list [az|za|baru|lama] [start-end] : tampilkan daftar dokumen dengan filter + paging
+  contoh: list baru 5-15
+- search <keyword> : cari dokumen berdasarkan judul/tanggal/kategori
+- help : tampilkan bantuan`, "info");
+    }
+
+    // Auto-suggestion
+    commandInput.addEventListener("input", () => {
+      const val = commandInput.value.trim().toLowerCase();
+      if (!val) {
+        suggestionBox.textContent = "";
+        return;
+      }
+      const match = commands.find(c => c.startsWith(val));
+      suggestionBox.textContent = match ? `Saran: ${match}` : "";
     });
 
-    // Tutup otomatis saat ukuran layar berubah
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    // Event listener CLI
+    commandInput.addEventListener("keydown", e=>{
+      if(e.key==="Enter"){
+        const parts=commandInput.value.trim().split(" ");
+        const cmd=parts[0];
+        const arg=parts.slice(1).join(" ");
+        print("> "+commandInput.value, "command");
 
-    window.addEventListener('resize', () => {
-      if (!isTouchDevice) { // hanya perangkat non-touch (desktop)
-        if (searchWrapper.classList.contains('active')) {
-          searchWrapper.classList.remove('active');
-          iconToggle.src = "/assets/icon/search.svg";
-          iconToggle.alt = "Search Icon";
-        } if (window.innerWidth >= 480) {
-          pageTitle.style.display = "";
-        } if (window.innerWidth < 480) {
-          pageTitle.style.display = "";
+        if(cmd==="show"){
+          const idx=parseInt(arg,10)-1;
+          if(isNaN(idx)||idx<0||idx>=docs.length) {
+            print("Nomor tidak valid.","error");
+          } else {
+            fetch(docs[idx].lokasi)
+              .then(res=>res.text())
+              .then(content=>{
+                // Buat container dokumen
+                const container = document.createElement("div");
+
+                // Judul (referensi langsung untuk scroll)
+                const titleElem = document.createElement("div");
+                titleElem.textContent = `=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`;
+                titleElem.classList.add("info");
+
+                // Isi
+                const contentElem = document.createElement("div");
+                contentElem.textContent = content;
+
+                // Susun dan append
+                container.appendChild(titleElem);
+                container.appendChild(contentElem);
+                cli.appendChild(container);
+
+                // Scroll ke judul terbaru (pakai referensi langsung, bukan getElementById)
+                titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
+              })
+              .catch(err=>print("Gagal membaca file: "+err,"error"));
+          }
+        } else if(cmd==="list"){
+          const args=arg.split(" ").filter(Boolean);
+          let keyword=args[0]||"";
+          let range=args[1]||null;
+          showList(keyword,range);
+        } else if(cmd==="search"){
+          if(!arg) print("Masukkan keyword pencarian.","error");
+          else searchDocs(arg);
+        } else if(cmd==="help"){
+          showHelp();
+        } else {
+          print("Perintah tidak dikenal.","error");
         }
+
+        commandInput.value="";
+        suggestionBox.textContent="";
       }
     });
-
   </script>
 </body>
-
 </html>
