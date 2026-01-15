@@ -119,7 +119,7 @@ function setupSearch() {
   const searchBox = document.getElementById("search-box");
   if (!searchBox) return;
 
-  searchBox.addEventListener("input", function(e) {
+  searchBox.addEventListener("input", function (e) {
     const keyword = e.target.value.toLowerCase().trim();
 
     if (keyword === "") {
@@ -161,23 +161,28 @@ async function loadBlog() {
     }
     const text = await response.text();
 
-    // // Ambil judul dari nama file
-    // let rawTitle = file.replace(".txt", "").replace(/-/g, " ");
-    // rawTitle = rawTitle.replace(/\b\w/g, c => c.toUpperCase());
+    // Ambil baris pertama sebagai judul
+    const lines = text.split("\n");
+    let rawTitle = "Tanpa Judul";
+    if (lines.length > 0) {
+      const match = lines[0].match(/#(.+?)#/);
+      if (match) {
+        rawTitle = match[1].trim();
+      }
+    }
 
-    // // Set judul dengan fade effect
-    // document.title = rawTitle;
-    // titleEl.innerText = rawTitle;
-    // titleEl.classList.add("view-title");
+    // Set judul dengan efek
+    document.title = rawTitle;
+    titleEl.innerText = rawTitle;
+    titleEl.classList.add("view-title");
 
-    // Render isi dengan parser + fade effect
-    contentEl.innerHTML = parseCustomMarkup(text);
-    contentEl.classList.add("fade-in");
+    // Render isi (tanpa baris judul pertama)
+    const contentWithoutTitle = lines.slice(1).join("\n");
+    contentEl.innerHTML = parseCustomMarkup(contentWithoutTitle);
   } catch (error) {
     contentEl.innerText = "artikel tidak ditemukan";
   }
 }
-
 
 function parseCustomMarkup(text) {
   let html = text;
