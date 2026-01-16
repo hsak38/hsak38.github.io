@@ -33,7 +33,6 @@
     #cli {
       flex: 1;
       padding: 15px;
-      margin-bottom: 80px;
       overflow-y: auto;
       white-space: pre-wrap;
       font-size: 12px;
@@ -59,7 +58,7 @@
 
     footer {
       background: #111;
-      position: fixed;
+      position: sticky;
       display: flex;
       bottom: 0;
       width: calc(100% - 20px);
@@ -161,9 +160,8 @@
 
     let docs = [];
     let docCache = {}; // cache isi dokumen
-    let historyResults = []; // simpan hasil perintah
 
-    const commands = ["show", "list", "search", "help", "history"];
+    const commands = ["show", "list", "search", "help"];
     let blocks = [];
     let currentBlockIndex = -1;
 
@@ -239,7 +237,6 @@
         output.push(line);
       });
       header.scrollIntoView({ behavior: "smooth", block: "start" });
-      historyResults.push({ command: `list ${keyword} ${range || ""}`, output });
     }
 
     function searchDocs(keyword) {
@@ -252,7 +249,6 @@
       if (results.length === 0) {
         const header = print(`Tidak ada dokumen cocok dengan "${keyword}".`, "error");
         header.scrollIntoView({ behavior: "smooth", block: "start" });
-        historyResults.push({ command: `search ${keyword}`, output: [`Tidak ada dokumen cocok dengan "${keyword}".`] });
       } else {
         const header = print(`Hasil pencarian "${keyword}":`, "info");
         let output = [`Hasil pencarian "${keyword}":`];
@@ -262,7 +258,6 @@
           output.push(line);
         });
         header.scrollIntoView({ behavior: "smooth", block: "start" });
-        historyResults.push({ command: `search ${keyword}`, output });
       }
     }
 
@@ -273,54 +268,21 @@
 - list [az|za|baru|lama] [start-end] : tampilkan daftar dokumen dengan filter + paging
   contoh: list baru 5-15
 - search <keyword> : cari dokumen berdasarkan judul/tanggal/kategori
-- help : tampilkan bantuan
-- history : tampilkan semua hasil perintah sebelumnya`;
+- help : tampilkan bantuan`;
       const header = print(text, "info");
-      header.scrollIntoView({ behavior: "smooth", block: "start" });
-      historyResults.push({ command: "help", output: [text] });
-    }
-
-    function showHistory() {
-      const block = newBlock();
-      const header = print("=== History Hasil Perintah ===", "info");
-      historyResults.forEach((h, i) => {
-        print(`${i + 1}. Perintah: ${h.command}`);
-        h.output.forEach(line => print("   " + line));
-      });
       header.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     // Auto-suggestion
-    // commandInput.addEventListener("input", () => {
-    //   const val = commandInput.value.trim().toLowerCase();
-    //   if (!val) {
-    //     suggestionBox.textContent = "";
-    //     return;
-    //   }
-    //   const match = commands.find(c => c.startsWith(val));
-    //   suggestionBox.textContent = match ? `Saran: ${match}` : "";
-    // });
     commandInput.addEventListener("input", () => {
       const val = commandInput.value.trim().toLowerCase();
-      suggestionBox.innerHTML = ""; // kosongkan dulu
-      if (!val) return;
-
-      const matches = commands.filter(c => c.startsWith(val));
-      matches.forEach(match => {
-        const sug = document.createElement("span");
-        sug.textContent = match;
-        sug.style.cursor = "pointer";
-        sug.style.marginRight = "10px";
-        sug.style.color = "#4caf50";
-        sug.addEventListener("click", () => {
-          commandInput.value = match + " "; // auto-complete ke input
-          suggestionBox.innerHTML = "";     // hilangkan suggestion
-          // commandInput.focus();             // fokus kembali ke input
-        });
-        suggestionBox.appendChild(sug);
-      });
+      if (!val) {
+        suggestionBox.textContent = "";
+        return;
+      }
+      const match = commands.find(c => c.startsWith(val));
+      suggestionBox.textContent = match ? `Saran: ${match}` : "";
     });
-
 
     // Event listener CLI
     commandInput.addEventListener("keydown", e => {
@@ -349,7 +311,6 @@
               const titleElem = print(`=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`, "info");
               print(docCache[docId]);
               titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
-              historyResults.push({ command: inputVal, output: [docs[idx].judul, docCache[docId]] });
             } else {
               // fetch pertama kali
               fetch(docs[idx].lokasi)
@@ -359,7 +320,6 @@
                   const titleElem = print(`=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`, "info");
                   print(content);
                   titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
-                  historyResults.push({ command: inputVal, output: [docs[idx].judul, content] });
                 })
                 .catch(err => {
                   const header = print("Gagal membaca file: " + err, "error");
@@ -381,8 +341,6 @@
           }
         } else if (cmd === "help") {
           showHelp();
-        } else if (cmd === "history") {
-          showHistory();
         } else {
           const header = print("Perintah tidak dikenal.", "error");
           header.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -391,10 +349,6 @@
         commandInput.value = "";
         suggestionBox.textContent = "";
       }
-    });
-
-    window.addEventListener('resize', () => {
-      document.body.style.height = window.innerHeight + 'px';
     });
   </script>
 </body>
