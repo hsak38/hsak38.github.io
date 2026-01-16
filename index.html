@@ -271,6 +271,7 @@
 - help : tampilkan bantuan`;
       const header = print(text, "info");
       header.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("command").blur();
     }
 
     // Auto-suggestion
@@ -340,7 +341,7 @@
             searchDocs(arg);
           }
         } else if (cmd === "help") {
-          showHelp().blur();
+          showHelp();
         } else {
           const header = print("Perintah tidak dikenal.", "error");
           header.scrollIntoView({ behavior: "smooth", block: "start" });
