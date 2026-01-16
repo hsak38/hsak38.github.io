@@ -315,7 +315,7 @@
         sug.addEventListener("click", () => {
           commandInput.value = match + " "; // auto-complete ke input
           suggestionBox.innerHTML = "";     // hilangkan suggestion
-          commandInput.focus();             // fokus kembali ke input
+          // commandInput.focus();             // fokus kembali ke input
         });
         suggestionBox.appendChild(sug);
       });
