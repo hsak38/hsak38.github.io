@@ -340,7 +340,7 @@
             searchDocs(arg);
           }
         } else if (cmd === "help") {
-          showHelp().focus();
+          showHelp().blur();
         } else {
           const header = print("Perintah tidak dikenal.", "error");
           header.scrollIntoView({ behavior: "smooth", block: "start" });
