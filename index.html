@@ -1,224 +1,398 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <title>Web CLI Reader</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit-cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
   <style>
-    :root {
-      --bg: #1e1e1e;
-      --cli-bg: #111;
-      --text: #e0e0e0;
-      --accent: #4caf50;
-      --error: #f44336;
-      --info: #2196f3;
+    @font-face {
+      font-family: 'Default';
+      src: url('KodeMono.ttf') format('truetype');
     }
+
     body {
       margin: 0;
-      font-family: monospace;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Default';
+      background: #111;
+      color: #e0e0e0;
       display: flex;
       flex-direction: column;
       height: 100vh;
+      min-width: 240px;
     }
+
     header {
       padding: 10px;
-      background: var(--cli-bg);
+      background: #111;
       text-align: center;
       font-weight: bold;
-      color: var(--accent);
+      color: #4caf50;
     }
+
     #cli {
       flex: 1;
-      background: var(--cli-bg);
       padding: 15px;
+      margin-bottom: 80px;
       overflow-y: auto;
       white-space: pre-wrap;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 1.4;
+      scroll-behavior: smooth;
     }
-    #cli .command { color: var(--accent); }
-    #cli .error { color: var(--error); }
-    #cli .info { color: var(--info); }
+
+    .block {
+      margin-bottom: 20px;
+    }
+
+    #cli .command {
+      color: #4caf50;
+    }
+
+    #cli .error {
+      color: #f44336;
+    }
+
+    #cli .info {
+      color: #2196f3;
+    }
+
     footer {
+      background: #111;
+      position: fixed;
       display: flex;
+      bottom: 0;
+      width: calc(100% - 20px);
+      min-width: 220px;
       flex-direction: column;
       padding: 10px;
-      background: var(--cli-bg);
     }
+
     #suggestion {
       margin-bottom: 5px;
       font-size: 12px;
-      color: var(--info);
+      color: #2196f3;
       min-height: 16px;
     }
+
+    .inputSection {
+      display: flex;
+      justify-content: flex-end;
+    }
+
     #command {
       flex: 1;
       padding: 10px;
       border: none;
       outline: none;
       background: #222;
-      color: var(--text);
+      color: #e0e0e0;
       font-family: monospace;
       font-size: 14px;
       border-radius: 4px;
+      min-width: 100px;
     }
-    @media (max-width: 600px) {
-      #cli { font-size: 12px; }
-      #command { font-size: 12px; }
+
+    #navButtons {
+      display: flex;
+      justify-content: space-between;
     }
+
+    #navButtons button {
+      flex: 1;
+      background: #333;
+      color: #e0e0e0;
+      padding: 0 15px 0 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 4px;
+      font-family: monospace;
+      cursor: pointer;
+    }
+
+    #navButtons button:hover {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    /* ukuran scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* background area scrollbar */
+::-webkit-scrollbar-track {
+  background: #111;   /* warna track */
+}
+
+/* bagian thumb (yang digeser) */
+::-webkit-scrollbar-thumb {
+  background: #4caf50; /* warna thumb */
+}
+
+/* efek hover pada thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #66bb6a;
+}
+
   </style>
 </head>
+
 <body>
-  <header>Web CLI Reader</header>
+  <header>WebLI Reader</header>
   <div id="cli">Memuat dokumen dari main.txt...</div>
   <footer>
     <div id="suggestion"></div>
-    <input type="text" id="command" placeholder="Ketik perintah lalu Enter...">
+    <div class="inputSection">
+      <input type="text" id="command" placeholder="Ketik perintah lalu Enter...">
+      <div id="navButtons">
+        <button id="scrollPrev">↑</button>
+        <button id="scrollNext">↓</button>
+      </div>
+    </div>
   </footer>
 
   <script>
     const cli = document.getElementById("cli");
     const commandInput = document.getElementById("command");
     const suggestionBox = document.getElementById("suggestion");
+    const scrollPrevBtn = document.getElementById("scrollPrev");
+    const scrollNextBtn = document.getElementById("scrollNext");
+
     let docs = [];
+    let docCache = {}; // cache isi dokumen
+    let historyResults = []; // simpan hasil perintah
 
-    const commands = ["show", "list", "search", "help"];
+    const commands = ["show", "list", "search", "help", "history"];
+    let blocks = [];
+    let currentBlockIndex = -1;
 
-    function print(msg, cls="") {
+    function newBlock() {
+      const block = document.createElement("div");
+      block.classList.add("block");
+      cli.appendChild(block);
+      blocks.push(block);
+      currentBlockIndex = blocks.length - 1;
+      return block;
+    }
+
+    function print(msg, cls = "") {
       const span = document.createElement("div");
       if (cls) span.classList.add(cls);
       span.textContent = msg;
-      cli.appendChild(span);
+      blocks[currentBlockIndex].appendChild(span);
       cli.scrollTop = cli.scrollHeight;
+      return span;
     }
+
+    // Navigasi antar blok
+    scrollPrevBtn.addEventListener("click", () => {
+      if (currentBlockIndex > 0) {
+        currentBlockIndex--;
+        blocks[currentBlockIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+    scrollNextBtn.addEventListener("click", () => {
+      if (currentBlockIndex < blocks.length - 1) {
+        currentBlockIndex++;
+        blocks[currentBlockIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
 
     // Baca main.txt
     fetch("main.txt")
       .then(res => res.text())
       .then(text => {
-        docs = text.split("\n")
-          .map(line => line.trim())
-          .filter(Boolean)
-          .map((line, idx) => {
-            const [judul, tanggal, kategori, lokasi] = line.split("|");
-            return { judul, tanggal, kategori, lokasi, originalIndex: idx + 1 };
-          });
+        docs = text.split("\n").map(line => line.trim()).filter(Boolean).map((line, idx) => {
+          const [judul, tanggal, kategori, lokasi] = line.split("|");
+          return { judul, tanggal, kategori, lokasi, originalIndex: idx + 1 };
+        });
+        const block = newBlock();
         print("Sistem siap. Ketik 'help' untuk melihat daftar perintah.", "info");
       })
       .catch(err => {
+        const block = newBlock();
         print("Gagal membaca main.txt: " + err, "error");
       });
 
     function showList(keyword, range) {
+      // const block = newBlock();
       let list = [...docs];
-      if (keyword === "az") list.sort((a,b)=>a.judul.localeCompare(b.judul));
-      else if (keyword === "za") list.sort((a,b)=>b.judul.localeCompare(a.judul));
-      else if (keyword === "baru") list.sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal));
-      else if (keyword === "lama") list.sort((a,b)=>new Date(a.tanggal)-new Date(b.tanggal));
+      if (keyword === "az") list.sort((a, b) => a.judul.localeCompare(b.judul));
+      else if (keyword === "za") list.sort((a, b) => b.judul.localeCompare(a.judul));
+      else if (keyword === "baru") list.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+      else if (keyword === "lama") list.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
       if (range) {
-        const [startStr,endStr]=range.split("-");
-        const start=parseInt(startStr,10)-1;
-        const end=parseInt(endStr,10);
-        if(!isNaN(start)&&!isNaN(end)&&start>=0&&end>start){
-          list=list.slice(start,end);
+        const [startStr, endStr] = range.split("-");
+        const start = parseInt(startStr, 10) - 1;
+        const end = parseInt(endStr, 10);
+        if (!isNaN(start) && !isNaN(end) && start >= 0 && end > start) {
+          list = list.slice(start, end);
         }
       }
-      print("Daftar dokumen:", "info");
-      list.forEach(d=>print(`${d.originalIndex}. ${d.judul} (${d.tanggal})`));
+      const header = print("Daftar dokumen:", "info");
+      let output = ["Daftar dokumen:"];
+      list.forEach(d => {
+        const line = `${d.originalIndex}. ${d.judul} (${d.tanggal})`;
+        print(line);
+        output.push(line);
+      });
+      header.scrollIntoView({ behavior: "smooth", block: "start" });
+      historyResults.push({ command: `list ${keyword} ${range || ""}`, output });
     }
 
     function searchDocs(keyword) {
+      const block = newBlock();
       const results = docs.filter(d =>
         d.judul.toLowerCase().includes(keyword.toLowerCase()) ||
         d.tanggal.toLowerCase().includes(keyword.toLowerCase()) ||
         d.kategori.toLowerCase().includes(keyword.toLowerCase())
       );
-      if(results.length===0) print(`Tidak ada dokumen cocok dengan "${keyword}".`, "error");
-      else {
-        print(`Hasil pencarian "${keyword}":`, "info");
-        results.forEach(d=>print(`${d.originalIndex}. ${d.judul} (${d.tanggal}) [${d.kategori}]`));
+      if (results.length === 0) {
+        const header = print(`Tidak ada dokumen cocok dengan "${keyword}".`, "error");
+        header.scrollIntoView({ behavior: "smooth", block: "start" });
+        historyResults.push({ command: `search ${keyword}`, output: [`Tidak ada dokumen cocok dengan "${keyword}".`] });
+      } else {
+        const header = print(`Hasil pencarian "${keyword}":`, "info");
+        let output = [`Hasil pencarian "${keyword}":`];
+        results.forEach(d => {
+          const line = `${d.originalIndex}. ${d.judul} (${d.tanggal}) [${d.kategori}]`;
+          print(line);
+          output.push(line);
+        });
+        header.scrollIntoView({ behavior: "smooth", block: "start" });
+        historyResults.push({ command: `search ${keyword}`, output });
       }
     }
 
     function showHelp() {
-      print(`=== Bantuan Perintah ===
+      const block = newBlock();
+      const text = `=== Bantuan Perintah ===
 - show <nomor> : tampilkan isi dokumen
 - list [az|za|baru|lama] [start-end] : tampilkan daftar dokumen dengan filter + paging
   contoh: list baru 5-15
 - search <keyword> : cari dokumen berdasarkan judul/tanggal/kategori
-- help : tampilkan bantuan`, "info");
+- help : tampilkan bantuan
+- history : tampilkan semua hasil perintah sebelumnya`;
+      const header = print(text, "info");
+      header.scrollIntoView({ behavior: "smooth", block: "start" });
+      historyResults.push({ command: "help", output: [text] });
+    }
+
+    function showHistory() {
+      const block = newBlock();
+      const header = print("=== History Hasil Perintah ===", "info");
+      historyResults.forEach((h, i) => {
+        print(`${i + 1}. Perintah: ${h.command}`);
+        h.output.forEach(line => print("   " + line));
+      });
+      header.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     // Auto-suggestion
+    // commandInput.addEventListener("input", () => {
+    //   const val = commandInput.value.trim().toLowerCase();
+    //   if (!val) {
+    //     suggestionBox.textContent = "";
+    //     return;
+    //   }
+    //   const match = commands.find(c => c.startsWith(val));
+    //   suggestionBox.textContent = match ? `Saran: ${match}` : "";
+    // });
     commandInput.addEventListener("input", () => {
       const val = commandInput.value.trim().toLowerCase();
-      if (!val) {
-        suggestionBox.textContent = "";
-        return;
-      }
-      const match = commands.find(c => c.startsWith(val));
-      suggestionBox.textContent = match ? `Saran: ${match}` : "";
+      suggestionBox.innerHTML = ""; // kosongkan dulu
+      if (!val) return;
+
+      const matches = commands.filter(c => c.startsWith(val));
+      matches.forEach(match => {
+        const sug = document.createElement("span");
+        sug.textContent = match;
+        sug.style.cursor = "pointer";
+        sug.style.marginRight = "10px";
+        sug.style.color = "#4caf50";
+        sug.addEventListener("click", () => {
+          commandInput.value = match + " "; // auto-complete ke input
+          suggestionBox.innerHTML = "";     // hilangkan suggestion
+          commandInput.focus();             // fokus kembali ke input
+        });
+        suggestionBox.appendChild(sug);
+      });
     });
 
+
     // Event listener CLI
-    commandInput.addEventListener("keydown", e=>{
-      if(e.key==="Enter"){
-        const parts=commandInput.value.trim().split(" ");
-        const cmd=parts[0];
-        const arg=parts.slice(1).join(" ");
-        print("> "+commandInput.value, "command");
+    commandInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const inputVal = commandInput.value.trim();
+        const parts = inputVal.split(" ");
+        const cmd = parts[0];
+        const arg = parts.slice(1).join(" ");
 
-        if(cmd==="show"){
-          const idx=parseInt(arg,10)-1;
-          if(isNaN(idx)||idx<0||idx>=docs.length) {
-            print("Nomor tidak valid.","error");
+        // buat blok baru untuk setiap perintah
+        const block = newBlock();
+        const cmdLine = document.createElement("div");
+        cmdLine.textContent = "> " + inputVal;
+        cmdLine.classList.add("command");
+        block.appendChild(cmdLine);
+
+        if (cmd === "show") {
+          const idx = parseInt(arg, 10) - 1;
+          if (isNaN(idx) || idx < 0 || idx >= docs.length) {
+            const header = print("Nomor tidak valid.", "error");
+            header.scrollIntoView({ behavior: "smooth", block: "start" });
           } else {
-            fetch(docs[idx].lokasi)
-              .then(res=>res.text())
-              .then(content=>{
-                // Buat container dokumen
-                const container = document.createElement("div");
-
-                // Judul (referensi langsung untuk scroll)
-                const titleElem = document.createElement("div");
-                titleElem.textContent = `=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`;
-                titleElem.classList.add("info");
-
-                // Isi
-                const contentElem = document.createElement("div");
-                contentElem.textContent = content;
-
-                // Susun dan append
-                container.appendChild(titleElem);
-                container.appendChild(contentElem);
-                cli.appendChild(container);
-
-                // Scroll ke judul terbaru (pakai referensi langsung, bukan getElementById)
-                titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
-              })
-              .catch(err=>print("Gagal membaca file: "+err,"error"));
+            const docId = docs[idx].originalIndex;
+            if (docCache[docId]) {
+              // tampilkan dari cache
+              const titleElem = print(`=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`, "info");
+              print(docCache[docId]);
+              titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
+              historyResults.push({ command: inputVal, output: [docs[idx].judul, docCache[docId]] });
+            } else {
+              // fetch pertama kali
+              fetch(docs[idx].lokasi)
+                .then(res => res.text())
+                .then(content => {
+                  docCache[docId] = content;
+                  const titleElem = print(`=== ${docs[idx].judul} (${docs[idx].tanggal}) ===`, "info");
+                  print(content);
+                  titleElem.scrollIntoView({ behavior: "smooth", block: "start" });
+                  historyResults.push({ command: inputVal, output: [docs[idx].judul, content] });
+                })
+                .catch(err => {
+                  const header = print("Gagal membaca file: " + err, "error");
+                  header.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            }
           }
-        } else if(cmd==="list"){
-          const args=arg.split(" ").filter(Boolean);
-          let keyword=args[0]||"";
-          let range=args[1]||null;
-          showList(keyword,range);
-        } else if(cmd==="search"){
-          if(!arg) print("Masukkan keyword pencarian.","error");
-          else searchDocs(arg);
-        } else if(cmd==="help"){
+        } else if (cmd === "list") {
+          const args = arg.split(" ").filter(Boolean);
+          let keyword = args[0] || "";
+          let range = args[1] || null;
+          showList(keyword, range);
+        } else if (cmd === "search") {
+          if (!arg) {
+            const header = print("Masukkan keyword pencarian.", "error");
+            header.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            searchDocs(arg);
+          }
+        } else if (cmd === "help") {
           showHelp();
+        } else if (cmd === "history") {
+          showHistory();
         } else {
-          print("Perintah tidak dikenal.","error");
+          const header = print("Perintah tidak dikenal.", "error");
+          header.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        commandInput.value="";
-        suggestionBox.textContent="";
+        commandInput.value = "";
+        suggestionBox.textContent = "";
       }
     });
   </script>
 </body>
+
 </html>
